@@ -6,6 +6,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
@@ -22,7 +23,7 @@ public class AuthenticationService {
         this.baseUrl = url;
     }
 
-    public AuthenticatedUser login(UserCredentials credentials) {
+    public AuthenticatedUser login(UserCredentials credentials) throws AuthenticationServiceException {
         HttpEntity<UserCredentials> entity = createCredentialsEntity(credentials);
         AuthenticatedUser user = null;
         try {
