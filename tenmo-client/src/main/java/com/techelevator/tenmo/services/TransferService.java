@@ -63,7 +63,7 @@ public class TransferService {
                                 "From: " + pending.getUserFrom() + "\r" +
                                 "To: " +pending.getUserTo() + "\r" +
                                 "Type: " + pending.getTransferType() + "\r" +
-                                "Status: " + pending.getTransferStatus() "\r" +
+                                "Status: " + pending.getTransferStatus()+ "\r" +
                                 "Amount: $" + pending.getAmount() + "\r");
                     }
                 }
@@ -83,12 +83,12 @@ public class TransferService {
         HttpEntity entity = new HttpEntity<>(headers);
         return entity;
     }
-
-    private HttpEntity<Transfers> makeAuthEntity() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setBearerAuth(currentUser.getToken());
-        HttpEntity <Transfers>  entity = new HttpEntity<>(transfer, headers);
-        return entity;
-    }
+//
+//    private HttpEntity<Transfers> makeAuthEntity() {
+//        HttpHeaders headers = new HttpHeaders();
+//        headers.setContentType(MediaType.APPLICATION_JSON);
+//        headers.setBearerAuth(currentUser.getToken());
+//        HttpEntity <Transfers>  entity = new HttpEntity<>(transfer, headers);
+//        return entity;
+//    }
 }

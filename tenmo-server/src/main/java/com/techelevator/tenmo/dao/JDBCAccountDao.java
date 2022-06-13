@@ -1,19 +1,16 @@
 package com.techelevator.tenmo.dao;
 
-
 import com.techelevator.tenmo.model.Account;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 
-import javax.swing.plaf.basic.BasicIconFactory;
 import java.math.BigDecimal;
 
 @Component
-public abstract class JDBCAccountDao implements AccountDao {
+public class JDBCAccountDao implements AccountDao {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -57,7 +54,12 @@ public abstract class JDBCAccountDao implements AccountDao {
     return account.getBalance();
 }
 
-@Override
+    @Override
+    public BigDecimal subtractFromBalance(BigDecimal amountToSubtract, int id) {
+        return null;
+    }
+
+    @Override
     public Account findUserById(int userId){
         String sqlString = "SELECT * FROM account WHERE user_id = ?";
         Account account = null;
