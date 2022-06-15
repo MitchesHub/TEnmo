@@ -82,7 +82,7 @@ public class JdbcUserDao implements UserDao {
         int newUserId = (int) keyHolder.getKeys().get(colum_id);
 
         // creating account
-        String sqlInsertAccount = "INSERT INTO account (user_id, balace) VALUES(?, ?)";
+        String sqlInsertAccount = "INSERT INTO account (user_id, balance) VALUES(?, ?)";
         accountCreated = jdbcTemplate.update(sqlInsertAccount, newUserId, STARTING_BALANCE) ==1;
 
         return userCreated && accountCreated;

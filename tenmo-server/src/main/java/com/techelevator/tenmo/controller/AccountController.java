@@ -21,13 +21,15 @@ public class AccountController {
     @Autowired
     private AccountDao accountDao;
     @Autowired
-    private UserDao  userDao;
+    private UserDao userDao;
 
     @Autowired
     public AccountController(AccountDao accountDao, UserDao userDao) {
         this.accountDao = accountDao;
         this.userDao = userDao;
     }
+
+    @PreAuthorize("hasRole ('ADMIN')")
 
     @RequestMapping(path = "/users", method = RequestMethod.GET)
     public List<User> listUsers() {
