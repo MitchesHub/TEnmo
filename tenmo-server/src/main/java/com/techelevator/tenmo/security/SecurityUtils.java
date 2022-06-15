@@ -10,9 +10,11 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Optional;
 
 public class SecurityUtils {
+
     private static final Logger LOG = LoggerFactory.getLogger(SecurityUtils.class);
 
-    private SecurityUtils() {}
+    private SecurityUtils() {
+    }
 
     /**
      * Get the login of the current user.

@@ -7,6 +7,7 @@ import java.math.BigDecimal;
 import java.util.Scanner;
 
 public class ConsoleService {
+
     private final Scanner scanner = new Scanner(System.in);
 
     public int promptForMenuSelection(String prompt) {
@@ -86,4 +87,5 @@ public class ConsoleService {
     public void printErrorMessage() {
         System.out.println("An error occurred. Check the log for details.");
     }
+
 }

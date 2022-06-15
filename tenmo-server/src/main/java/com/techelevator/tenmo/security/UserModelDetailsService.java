@@ -19,6 +19,7 @@ import java.util.stream.Collectors;
  */
 @Component("userDetailsService")
 public class UserModelDetailsService implements UserDetailsService {
+
     private final Logger log = LoggerFactory.getLogger(UserModelDetailsService.class);
 
     private final UserDao userDao;

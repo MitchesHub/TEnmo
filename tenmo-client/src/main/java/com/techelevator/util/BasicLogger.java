@@ -14,7 +14,7 @@ public class BasicLogger {
 	public static void log(String message) {
 		try {
 			if (pw == null) {
-				String logFilename = "log" + LocalDate.now().format(DateTimeFormatter.ISO_DATE) + ".txt";
+				String logFilename = "log.txt" + LocalDate.now().format(DateTimeFormatter.ISO_DATE) + ".log";
 				pw = new PrintWriter(new FileOutputStream(logFilename, true));
 			}
 			pw.println(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME) + " " + message);

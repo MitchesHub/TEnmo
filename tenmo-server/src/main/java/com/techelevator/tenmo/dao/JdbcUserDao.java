@@ -16,6 +16,7 @@ import java.util.List;
 
 @Component
 public class JdbcUserDao implements UserDao {
+
     private static final BigDecimal STARTING_BALANCE = new BigDecimal("1000.00");
     private JdbcTemplate jdbcTemplate;
 
@@ -25,13 +26,14 @@ public class JdbcUserDao implements UserDao {
 
     @Override
     public int findIdByUsername(String username) {
-        String sqlString = "SELECT user_id FROM tenmo_user WHERE username = ?";
+        String sqlString = "SELECT user_id  FROM tenmo_user WHERE username = ?";
         Integer id = jdbcTemplate.queryForObject(sqlString, Integer.class, username);
         if (id != null) {
             return id;
         } else {
             return -1;
         }
+
     }
 
     @Override
@@ -47,39 +49,46 @@ public class JdbcUserDao implements UserDao {
     }
 
     @Override
-    public User findByUsername(String username) throws UsernameNotFoundException {
+    public User findByUsername(String username) {
+        return null;
+    }
+
+    public User findByUserName(String username) throws UsernameNotFoundException {
        String sqlString = "SELECT * FROM tenmo_user WHERE username = ?";
        SqlRowSet results = jdbcTemplate.queryForRowSet(sqlString, username);
        if (results.next()) {
            return mapRowToUser(results);
        }
-       throw new UsernameNotFoundException("User " + username +" was not found");
+       throw new UsernameNotFoundException( "User " + username +" was not found");
     }
 
-    @Override // create new user
+    @Override //create new user
     public boolean create(String username, String password) {
         boolean userCreated = false;
         boolean accountCreated = false;
 
-        String sqlInsertUser = "INSERT INTO tenmo_user (username, password_hash) VALUES (?, ?)";
+        String sqlInsertUser = "INSERT INTO tenmo_user( username, password_hash) VALUES (?, ?)";
         String passwordHash = new BCryptPasswordEncoder().encode(password);
 
         GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
-        String column_id = "user_id";
-        userCreated = jdbcTemplate.update(con -> {
-            PreparedStatement preparedStatement = con.prepareStatement(sqlInsertUser, new String[] { column_id });
+        String colum_id = "user_id";
+        userCreated = jdbcTemplate.update(con-> {
+            PreparedStatement preparedStatement = con.prepareStatement(sqlInsertUser, new String[] {colum_id});
             preparedStatement.setString(1, username);
             preparedStatement.setString(2, passwordHash);
             return preparedStatement;
-        }, keyHolder) == 1;
-        int newUserId = (int) keyHolder.getKeys().get(column_id);
+        }
+        , keyHolder) ==1;
+        int newUserId = (int) keyHolder.getKeys().get(colum_id);
 
         // creating account
-        String sqlInsertAccount = "INSERT INTO account (user_id, balance) VALUES (?, ?)";
-        accountCreated = jdbcTemplate.update(sqlInsertAccount, newUserId, STARTING_BALANCE) == 1;
+        String sqlInsertAccount = "INSERT INTO account (user_id, balance) VALUES(?, ?)";
+        accountCreated = jdbcTemplate.update(sqlInsertAccount, newUserId, STARTING_BALANCE) ==1;
 
         return userCreated && accountCreated;
     }
+
+
 
     private User mapRowToUser(SqlRowSet results) {
         User user = new User();
@@ -90,4 +99,6 @@ public class JdbcUserDao implements UserDao {
         user.setAuthorities("ROLE_USER");
         return user;
     }
+
+
 }

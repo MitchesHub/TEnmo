@@ -5,13 +5,14 @@ import java.util.Objects;
 import java.util.Set;
 
 public class User {
+
    private Long id;
    private String username;
    private String password;
    private boolean activated;
    private Set<Authority> authorities = new HashSet<>();
 
-   public User() {}
+   public User() { }
 
    public User(Long id, String username, String password, String authorities) {
       this.id = id;
