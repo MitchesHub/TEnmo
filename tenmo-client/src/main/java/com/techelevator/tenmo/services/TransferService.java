@@ -12,14 +12,13 @@ import org.springframework.web.client.RestTemplate;
 import java.util.Scanner;
 
 public class TransferService {
-
     private String BASE_URL;
     private RestTemplate restTemplate = new RestTemplate();
     private AuthenticatedUser currentUser;
 
     public TransferService(String url, AuthenticatedUser currentUser) {
-        this.currentUser = currentUser;
         BASE_URL = url;
+        this.currentUser = currentUser;
     }
 
     public Transfers[] transferList() {

@@ -3,7 +3,6 @@ package com.techelevator.tenmo.model;
 import java.util.Objects;
 
 public class Authority {
-
    private String name;
 
    public String getName() {

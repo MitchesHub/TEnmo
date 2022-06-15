@@ -3,7 +3,6 @@ package com.techelevator.tenmo.model;
 import javax.validation.constraints.NotEmpty;
 
 public class RegisterUserDTO {
-
     @NotEmpty
     private String username;
     @NotEmpty

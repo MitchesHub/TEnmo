@@ -17,8 +17,8 @@ public class AccountService {
     public AuthenticatedUser currentUser;
 
     private AccountService(String url, AuthenticatedUser currentUser) {
-        this.currentUser = currentUser;
         BASE_URL = url;
+        this.currentUser = currentUser;
     }
 
     public BigDecimal getBalance() {
