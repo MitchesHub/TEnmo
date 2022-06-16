@@ -29,23 +29,19 @@ public class AccountController {
         this.userDao = userDao;
     }
 
-    @PreAuthorize("hasRole ('ADMIN')")
-
+    @PreAuthorize("hasRole('ADMIN')")
     @RequestMapping(path = "/users", method = RequestMethod.GET)
     public List<User> listUsers() {
-        List<User> users = userDao.findAll();
-        return users;
+        return userDao.findAll();
     }
 
     @RequestMapping(path = "/balance/{id}", method = RequestMethod.GET)
     public BigDecimal getBalance(@PathVariable int id) {
-        BigDecimal balance = accountDao.getBalance(id);
-        return balance;
+        return accountDao.getBalance(id);
     }
 
-@RequestMapping(path = "/account/user/{id}", method =  RequestMethod.GET)
-    public Account findUserById (@PathVariable int userId) {
+    @RequestMapping(path = "/account/user/{id}", method = RequestMethod.GET)
+    public Account findUserById(@PathVariable int userId) {
         return accountDao.findUserById(userId);
-
-}
+    }
 }

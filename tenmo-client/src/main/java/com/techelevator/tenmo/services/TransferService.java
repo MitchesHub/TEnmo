@@ -18,14 +18,14 @@ public class TransferService {
     private AuthenticatedUser currentUser;
 
     public TransferService(String url, AuthenticatedUser currentUser) {
-        this.currentUser = currentUser;
         BASE_URL = url;
+        this.currentUser = currentUser;
     }
 
     public Transfers[] transferList() {
-        Transfers[] outCome = null;
+        Transfers[] outcome = null;
         try {
-            outCome = restTemplate.exchange(BASE_URL + "account/transfer/" +
+            outcome = restTemplate.exchange(BASE_URL + "account/transfer/" +
                     currentUser.getUser().getId(), HttpMethod.GET, makeAuthEntity(),
                     Transfers[].class).getBody();
             System.out.println("-------------------------------------------\r" +
@@ -33,7 +33,7 @@ public class TransferService {
                             "-------------------------------------------\r");
             String fromTo = "";
             String name = "";
-            for (Transfers i : outCome) {
+            for (Transfers i : outcome) {
                 if (currentUser.getUser().getId() == i.getAccountFrom()) {
                     fromTo = "From: ";
                     name = i.getUserTo();
@@ -50,7 +50,7 @@ public class TransferService {
             String input = scanner.nextLine();
             if (Integer.parseInt(input) == 0) {
                 boolean givenTransferId = false;
-                for (Transfers i : outCome) {
+                for (Transfers i : outcome) {
                     if (Integer.parseInt(input) == i.getTransferId()) {
                         Transfers pending = restTemplate.exchange(BASE_URL +
                                 "transfers/" + i.getTransferId(), HttpMethod.GET,
@@ -59,7 +59,7 @@ public class TransferService {
                         System.out.println("-------------------------------------------\r" +
                                 "Transfer Details\r " +
                                 "-------------------------------------------\r" +
-                                "Id: " + pending.getTransferId()+ "\r" +
+                                "Id: " + pending.getTransferId() + "\r" +
                                 "From: " + pending.getUserFrom() + "\r" +
                                 "To: " +pending.getUserTo() + "\r" +
                                 "Type: " + pending.getTransferType() + "\r" +
@@ -68,13 +68,13 @@ public class TransferService {
                     }
                 }
                 if (!givenTransferId) {
-                    System.out.println("Transfer Id not valid");
+                    System.out.println("Transfer ID not valid");
                 }
             }
         } catch (Exception exception) {
             System.out.println("Transaction not successful");
         }
-        return outCome;
+        return outcome;
     }
 
     private HttpEntity makeAuthEntity() {

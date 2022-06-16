@@ -17,8 +17,8 @@ public class AccountService {
     public AuthenticatedUser currentUser;
 
     private AccountService(String url, AuthenticatedUser currentUser) {
-        this.currentUser = currentUser;
         BASE_URL = url;
+        this.currentUser = currentUser;
     }
 
     public BigDecimal getBalance() {
@@ -26,9 +26,9 @@ public class AccountService {
         try {
             balance = restTemplate.exchange(BASE_URL + "balance/" + currentUser.getUser().getId(), HttpMethod.GET,
                     makeAuthEntity(), BigDecimal.class).getBody();
-            System.out.println("Your current account Balance is: $" + balance);
-        }catch (RestClientResponseException exception) {
-            System.out.println("Unable to retrieve Balance");
+            System.out.println("Your current account balance is: $" + balance);
+        } catch (RestClientResponseException exception) {
+            System.out.println("Unable to retrieve balance");
         }
         return balance;
     }
@@ -39,5 +39,5 @@ public class AccountService {
         HttpEntity entity = new HttpEntity<>(headers);
         return entity;
 
+        }
     }
-}

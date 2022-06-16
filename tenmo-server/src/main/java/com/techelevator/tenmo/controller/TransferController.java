@@ -16,7 +16,7 @@ public class TransferController {
     @Autowired
     private TransfersDao transferDao;
 
-    @RequestMapping(value = "account/transfers/{id}", method =  RequestMethod.GET)
+    @RequestMapping(value = "account/transfers/{id}", method = RequestMethod.GET)
     public List<Transfers> getAllMyTransfers(@PathVariable int id) {
         List<Transfers> outcome = transferDao.getAllTransfers(id);
         return outcome;

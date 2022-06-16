@@ -30,5 +30,5 @@ public class LoginDTO {
               "username='" + username + '\'' +
               ", password='" + password + '\'' +
               '}';
+      }
    }
-}

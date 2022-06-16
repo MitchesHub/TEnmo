@@ -36,5 +36,5 @@ public class Authority {
       return "Authority{" +
          "name=" + name +
          '}';
+    }
    }
-}

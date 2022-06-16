@@ -13,6 +13,5 @@ public interface AccountDao {
 
     Account findUserById(int userId);
 
-
     Account findAccountById(int id);
 }

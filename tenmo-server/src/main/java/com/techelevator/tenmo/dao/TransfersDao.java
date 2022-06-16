@@ -7,8 +7,6 @@ import java.util.List;
 
 public interface TransfersDao {
 
-
-
     public List<Transfers> getAllTransfers(int userId);
     public List<Transfers>getPendingRequests(int userId);
     public Transfers getTransfersById(int transferId);
