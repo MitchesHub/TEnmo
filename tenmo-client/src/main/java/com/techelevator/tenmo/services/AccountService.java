@@ -16,11 +16,12 @@ public class AccountService {
     private RestTemplate restTemplate = new RestTemplate();
     public AuthenticatedUser currentUser;
 
-    private AccountService(String url, AuthenticatedUser currentUser) {
+    public AccountService(String url, AuthenticatedUser currentUser) {
         BASE_URL = url;
         this.currentUser = currentUser;
     }
 
+    /*
     public BigDecimal getBalance() {
         BigDecimal balance = new BigDecimal(0);
         try {
@@ -32,12 +33,12 @@ public class AccountService {
         }
         return balance;
     }
+    */
 
     private HttpEntity<UserCredentials> makeAuthEntity() {
         org.springframework.http.HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(currentUser.getToken());
         HttpEntity entity = new HttpEntity<>(headers);
         return entity;
-
-        }
     }
+}

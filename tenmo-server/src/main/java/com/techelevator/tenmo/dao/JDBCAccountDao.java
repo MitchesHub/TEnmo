@@ -18,16 +18,15 @@ public class JDBCAccountDao implements AccountDao {
     public JDBCAccountDao() {}
 
     public JDBCAccountDao(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate= jdbcTemplate;
+        this.jdbcTemplate = jdbcTemplate;
     }
 
     @Override
-    public BigDecimal getBalance(int userId) {
-        String sqlString = "SELECT balance FROM account WHERE user_id = ?";
-        SqlRowSet results = null;
+    public BigDecimal getBalance(long userId) {
+        String sqlString = "SELECT balance FROM account WHERE user_id = ?;";
         BigDecimal balance = null;
         try {
-            results = jdbcTemplate.queryForRowSet(sqlString, userId);
+            SqlRowSet results = jdbcTemplate.queryForRowSet(sqlString, userId);
             if (results.next()) {
                 balance = results.getBigDecimal("balance");
             }
@@ -38,7 +37,7 @@ public class JDBCAccountDao implements AccountDao {
     }
 
     @Override
-    public BigDecimal addToBalance(BigDecimal amountToAdd, int id) {
+    public BigDecimal addToBalance(BigDecimal amountToAdd, long id) {
         Account account = findAccountById(id);
         BigDecimal newBalance = account.getBalance().add(amountToAdd);
         System.out.println(newBalance);
@@ -52,12 +51,12 @@ public class JDBCAccountDao implements AccountDao {
     }
 
     @Override
-    public BigDecimal subtractFromBalance(BigDecimal amountToSubtract, int id) {
+    public BigDecimal subtractFromBalance(BigDecimal amountToSubtract, long id) {
         return null;
     }
 
     @Override
-    public Account findUserById(int userId) {
+    public Account findUserById(long userId) {
         String sqlString = "SELECT * FROM account WHERE user_id = ?";
         Account account = null;
         try {
@@ -70,7 +69,7 @@ public class JDBCAccountDao implements AccountDao {
 }
 
     @Override
-    public Account findAccountById(int id) {
+    public Account findAccountById(long id) {
         Account account = null;
         String sqlString = "SELECT * FROM account WHERE account_id = ?";
         SqlRowSet results = jdbcTemplate.queryForRowSet(sqlString, id);

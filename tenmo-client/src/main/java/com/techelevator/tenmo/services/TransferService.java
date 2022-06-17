@@ -12,7 +12,6 @@ import org.springframework.web.client.RestTemplate;
 import java.util.Scanner;
 
 public class TransferService {
-
     private String BASE_URL;
     private RestTemplate restTemplate = new RestTemplate();
     private AuthenticatedUser currentUser;
@@ -25,8 +24,7 @@ public class TransferService {
     public Transfers[] transferList() {
         Transfers[] outcome = null;
         try {
-            outcome = restTemplate.exchange(BASE_URL + "account/transfer/" +
-                    currentUser.getUser().getId(), HttpMethod.GET, makeAuthEntity(),
+            outcome = restTemplate.exchange(BASE_URL + "account/transfers", HttpMethod.GET, makeAuthEntity(),
                     Transfers[].class).getBody();
             System.out.println("-------------------------------------------\r" +
                     "Transfers\r\n" + "ID          From/To                 Amount\r" +
@@ -56,6 +54,7 @@ public class TransferService {
                                 "transfers/" + i.getTransferId(), HttpMethod.GET,
                                 makeAuthEntity(), Transfers.class).getBody();
                         givenTransferId = true;
+                        assert pending != null;
                         System.out.println("-------------------------------------------\r" +
                                 "Transfer Details\r " +
                                 "-------------------------------------------\r" +

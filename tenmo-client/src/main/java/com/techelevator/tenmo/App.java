@@ -1,9 +1,20 @@
 package com.techelevator.tenmo;
 
+import com.techelevator.tenmo.model.Account;
 import com.techelevator.tenmo.model.AuthenticatedUser;
+import com.techelevator.tenmo.model.User;
 import com.techelevator.tenmo.model.UserCredentials;
+import com.techelevator.tenmo.services.AccountService;
 import com.techelevator.tenmo.services.AuthenticationService;
 import com.techelevator.tenmo.services.ConsoleService;
+import io.cucumber.java.en_old.Ac;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.web.client.RestClientResponseException;
+import org.springframework.web.client.RestTemplate;
+
+import java.math.BigDecimal;
 
 public class App {
 
@@ -13,6 +24,9 @@ public class App {
     private final AuthenticationService authenticationService = new AuthenticationService(API_BASE_URL);
 
     private AuthenticatedUser currentUser;
+    private AccountService accountService = new AccountService(API_BASE_URL, currentUser);
+
+    RestTemplate restTemplate = new RestTemplate();
 
     public static void main(String[] args) {
         App app = new App();
@@ -85,8 +99,13 @@ public class App {
     }
 
 	private void viewCurrentBalance() {
-		// TODO Auto-generated method stub
-		
+        try {
+            BigDecimal balance = restTemplate.exchange(API_BASE_URL + "api/balance", HttpMethod.GET,
+                    makeAuthEntity(), BigDecimal.class).getBody();
+            System.out.println("Your current account balance is: $" + balance);
+        } catch (RestClientResponseException exception) {
+            System.out.println("Unable to retrieve balance");
+        }
 	}
 
 	private void viewTransferHistory() {
@@ -109,4 +128,18 @@ public class App {
 		
 	}
 
+    private HttpEntity<UserCredentials> makeAuthEntity() {
+        org.springframework.http.HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(currentUser.getToken());
+        HttpEntity entity = new HttpEntity<>(headers);
+        return entity;
+    }
+
+    /*
+     * Helper method to create a decimal out of a long, displays 2 trailing decimal values as this is money
+     */
+    public static String format(BigDecimal value) {
+        return null;
+        //return " $" + String.format("%.2f", BigDecimal.valueOf(value / 100));
+    }
 }

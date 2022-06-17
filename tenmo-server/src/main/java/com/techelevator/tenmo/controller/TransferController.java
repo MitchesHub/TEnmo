@@ -16,29 +16,22 @@ public class TransferController {
     @Autowired
     private TransfersDao transferDao;
 
-    @RequestMapping(value = "account/transfers/{id}", method = RequestMethod.GET)
-    public List<Transfers> getAllMyTransfers(@PathVariable int id) {
-        List<Transfers> outcome = transferDao.getAllTransfers(id);
-        return outcome;
+    @RequestMapping(value = "account/transfers", method = RequestMethod.GET)
+    public List<Transfers> getAllMyTransfers(@PathVariable long id) {
+        return transferDao.getAllTransfers(id);
     }
-    @RequestMapping(path = "transfers/{id}", method = RequestMethod.GET)
-    public Transfers getSelectedTransfer(@PathVariable int id) {
-        Transfers transfer = transferDao.getTransfersById(id);
-        return transfer;
+    @RequestMapping(path = "transfers", method = RequestMethod.GET)
+    public Transfers getSelectedTransfer(@PathVariable long id) {
+        return transferDao.getTransfersById(id);
     }
 
     @RequestMapping(path = "transfer", method = RequestMethod.POST)
     public String sendTransfer(@RequestBody Transfers transfers) {
-        String results = transferDao.sendTransfer(transfers.getAccountFrom(),
-                transfers.getAccountTo(), transfers.getAmount());
-        return results;
+        return transferDao.sendTransfer(transfers.getAccountFrom(), transfers.getAccountTo(), transfers.getAmount());
     }
 
     @RequestMapping(path = "request", method = RequestMethod.POST)
     public String requestTransfer(@RequestBody Transfers transfers) {
-        String results = transferDao.requestTransfer(transfers.getAccountFrom(),
-                transfers.getAccountTo(), transfers.getAmount());
-        return results;
-
+        return transferDao.requestTransfer(transfers.getAccountFrom(), transfers.getAccountTo(), transfers.getAmount());
     }
 }

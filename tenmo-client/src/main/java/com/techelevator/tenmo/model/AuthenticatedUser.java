@@ -3,7 +3,12 @@ package com.techelevator.tenmo.model;
 public class AuthenticatedUser {
 	private String token;
 	private User user;
-	
+
+	@Override
+	public String toString() {
+		return getToken();
+	}
+
 	public String getToken() {
 		return token;
 	}
