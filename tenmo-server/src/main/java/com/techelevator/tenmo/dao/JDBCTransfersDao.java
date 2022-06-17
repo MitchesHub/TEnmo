@@ -19,7 +19,7 @@ public class JDBCTransfersDao implements TransfersDao {
     private AccountDao accountDao;
 
     @Override
-    public List<Transfers> getAllTransfers(long userId) {
+    public List<Transfers> getAllTransfers(int userId) {
         List<Transfers> list = new ArrayList<>();
         String sqlString = "SELECT t.*, tu.username AS userFrom, tub.username AS userTo " +
                 "FROM transfer t " +
@@ -27,7 +27,7 @@ public class JDBCTransfersDao implements TransfersDao {
                 "JOIN account b ON t.account_to = b.account_id " +
                 "JOIN tenmo_user tu ON a.user_id = tu.user_id " +
                 "JOIN tenmo_user tub ON b.user_id = tub.user_id " +
-                "WHERE a.user_id = ? OR b.user_id = ?";
+                "WHERE a.user_id = ? OR b.user_id = ? ";
         SqlRowSet results = jdbcTemplate.queryForRowSet(sqlString, userId, userId);
         while (results.next()) {
             Transfers transfers = mapRowToTransfer(results);
@@ -37,7 +37,7 @@ public class JDBCTransfersDao implements TransfersDao {
     }
 
     @Override
-    public Transfers getTransfersById(long transferId) {
+    public Transfers getTransfersById(int transferId) {
         Transfers transfers = new Transfers();
         String sqlString = "SELECT t.*, tu.username AS userFrom, tub.username AS userTo " +
                 "FROM transfer t " +
@@ -56,7 +56,7 @@ public class JDBCTransfersDao implements TransfersDao {
     }
 
     @Override
-    public String sendTransfer(long userFrom, long userTo, BigDecimal amount) {
+    public String sendTransfer(int userFrom, int userTo, BigDecimal amount) {
         if (userFrom == userTo) {
             return "Invalid, may not send money to yourself";
         }
@@ -74,7 +74,7 @@ public class JDBCTransfersDao implements TransfersDao {
     }
 
     @Override
-    public String requestTransfer(long userFrom, long userTo, BigDecimal amount) {
+    public String requestTransfer(int userFrom, int userTo, BigDecimal amount) {
         if (userFrom == userTo) {
             return "You may not request money from yourself";
         }
@@ -90,7 +90,7 @@ public class JDBCTransfersDao implements TransfersDao {
     }
 
     @Override
-    public List<Transfers> getPendingRequests(long userId) {
+    public List<Transfers> getPendingRequests(int userId) {
         List<Transfers> outcome = new ArrayList<>();
         String sqlString = "SELECT t.*, tu.username AS userFrom, tub.username AS userTo " +
                 "FROM transfer t " +
