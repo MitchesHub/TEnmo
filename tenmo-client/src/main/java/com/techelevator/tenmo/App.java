@@ -15,14 +15,10 @@ import org.springframework.web.client.RestTemplate;
 import java.math.BigDecimal;
 
 public class App {
-
     private static final String API_BASE_URL = "http://localhost:8080/";
-
     private final ConsoleService consoleService = new ConsoleService();
     private final AuthenticationService authenticationService = new AuthenticationService(API_BASE_URL);
-
     private AuthenticatedUser currentUser;
-    private AccountService accountService;
     private TransferService transferService;
 
     RestTemplate restTemplate = new RestTemplate();
@@ -98,7 +94,7 @@ public class App {
     }
 
 	private void viewCurrentBalance() {
-        accountService = new AccountService(API_BASE_URL, currentUser);
+        AccountService accountService = new AccountService(API_BASE_URL, currentUser);
         accountService.getBalance();
 	}
 
@@ -108,7 +104,8 @@ public class App {
 	}
 
 	private void viewPendingRequests() {
-		// TODO Auto-generated method stub
+		transferService = new TransferService(API_BASE_URL, currentUser);
+        transferService.transfersRequestList();
 	}
 
 	private void sendBucks() {
@@ -117,8 +114,8 @@ public class App {
 	}
 
 	private void requestBucks() {
-		// TODO Auto-generated method stub
-		
+		transferService = new TransferService(API_BASE_URL, currentUser);
+        transferService.requestBucks();
 	}
 
     private HttpEntity<UserCredentials> makeAuthEntity() {
@@ -126,13 +123,5 @@ public class App {
         headers.setBearerAuth(currentUser.getToken());
         HttpEntity entity = new HttpEntity<>(headers);
         return entity;
-    }
-
-    /*
-     * Helper method to create a decimal out of a long, displays 2 trailing decimal values as this is money
-     */
-    public static String format(BigDecimal value) {
-        return null;
-        //return " $" + String.format("%.2f", BigDecimal.valueOf(value / 100));
     }
 }
