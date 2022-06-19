@@ -23,15 +23,16 @@ public class JDBCAccountDao implements AccountDao {
 
     @Override
     public BigDecimal getBalance(long userId) {
-        String sqlString = "SELECT balance FROM account WHERE user_id = ?;";
+        String sqlString = "SELECT balance FROM account WHERE user_id = ?";
+        SqlRowSet results = null;
         BigDecimal balance = null;
         try {
-            SqlRowSet results = jdbcTemplate.queryForRowSet(sqlString, userId);
+            results = jdbcTemplate.queryForRowSet(sqlString, userId);
             if (results.next()) {
                 balance = results.getBigDecimal("balance");
             }
-        } catch (DataAccessException exception) {
-            System.out.println("Something went wrong, error accessing data");
+        } catch (DataAccessException e) {
+            System.out.println("Something went wrong; error accessing data");
         }
         return balance;
     }
@@ -41,32 +42,32 @@ public class JDBCAccountDao implements AccountDao {
         Account account = findAccountById(id);
         BigDecimal newBalance = account.getBalance().add(amountToAdd);
         System.out.println(newBalance);
-        String sqlString = "UPDATE account SET balance = ? WHERE user_id = ?";
+        String sqlString = "UPDATE account SET balance = ? WHERE account_id = ?;";
         try {
             jdbcTemplate.update(sqlString, newBalance, id);
-        } catch (DataAccessException exception) {
-            System.out.println("Something went wrong, error accessing data");
+        } catch (DataAccessException e) {
+            System.out.println("Something went wrong; error accessing data");
         }
         return account.getBalance();
     }
 
     @Override
     public BigDecimal subtractFromBalance(BigDecimal amountToSubtract, long id) {
-        return null;
-    }
-
-    @Override
-    public Account findUserById(long userId) {
-        String sqlString = "SELECT * FROM account WHERE user_id = ?";
-        Account account = null;
+        Account account = findAccountById(id);
+        BigDecimal newBalance = account.getBalance().subtract(amountToSubtract);
+        String sqlString = "UPDATE account SET balance = ? WHERE account_id = ?";
         try {
-            SqlRowSet results = jdbcTemplate.queryForRowSet(sqlString,userId);
-            account = mapRowToAccount(results);
+            jdbcTemplate.update(sqlString, newBalance, id);
         } catch (DataAccessException exception) {
             System.out.println("Something went wrong, error accessing data");
         }
-        return account;
+        return account.getBalance();
 }
+
+    @Override
+    public Account findUserById(long userId) {
+        return null;
+    }
 
     @Override
     public Account findAccountById(long id) {

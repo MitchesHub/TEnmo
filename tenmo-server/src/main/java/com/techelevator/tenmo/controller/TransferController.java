@@ -10,30 +10,41 @@ import java.util.List;
 
 @RestController
 @PreAuthorize("isAuthenticated()")
-
 public class TransferController {
-
     @Autowired
-    private TransfersDao transferDao;
+    private TransfersDao transfersDao;
 
+    @RequestMapping(value = "account/transfers/{id}", method = RequestMethod.GET)
+    public List<Transfers> getAllMyTransfers(@PathVariable long id) {
+        return transfersDao.getAllTransfers(id);
+    }
 
-    @RequestMapping(value = "/account/transfers", method = RequestMethod.GET)
-    public List<Transfers> getAllTransfers(@PathVariable int id) {
-       List <Transfers> results = transferDao.getAllTransfers(id);
+    @RequestMapping(path = "transfers/{id}", method = RequestMethod.GET)
+    public Transfers getSelectedTransfer(@PathVariable long id) {
+        return transfersDao.getTransferById(id);
+    }
+
+    @RequestMapping(path = "transfer", method = RequestMethod.POST)
+    public String sendTransferRequest(@RequestBody Transfers transfer) {
+        String results = transfersDao.sendTransfer(transfer.getAccountFrom(), transfer.getAccountTo(), transfer.getAmount());
         return results;
     }
-    @RequestMapping(path = "/account/transfers{id}", method = RequestMethod.GET)
-    public Transfers getSelectedTransfer(@PathVariable int id) {
-        return transferDao.getTransfersById(id);
+
+    @RequestMapping(path = "request", method = RequestMethod.POST)
+    public String requestTransferRequest(@RequestBody Transfers transfer) {
+        String results = transfersDao.requestTransfer(transfer.getAccountFrom(), transfer.getAccountTo(), transfer.getAmount());
+        return results;
     }
 
-    @RequestMapping(path = "/transfer", method = RequestMethod.POST)
-    public String sendTransfer(@RequestBody Transfers transfers) {
-        return transferDao.sendTransfer(transfers.getAccountFrom(), transfers.getAccountTo(), transfers.getAmount());
+    @RequestMapping(value = "request/{id}", method = RequestMethod.GET)
+    public List<Transfers> getAllTransferRequests(@PathVariable int id) {
+        List<Transfers> output = transfersDao.getPendingRequests(id);
+        return output;
     }
 
-    @RequestMapping(path = "/request", method = RequestMethod.POST)
-    public String requestTransfer(@RequestBody Transfers transfers) {
-        return transferDao.requestTransfer(transfers.getAccountFrom(), transfers.getAccountTo(), transfers.getAmount());
+    @RequestMapping(path = "transfer/status/{statusId}", method = RequestMethod.PUT)
+    public String updateRequest(@RequestBody Transfers transfer, @PathVariable int statusId) {
+        String output = transfersDao.updateTransferRequest(transfer, statusId);
+        return output;
     }
 }

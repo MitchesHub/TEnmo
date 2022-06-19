@@ -70,6 +70,17 @@ public class ConsoleService {
         }
     }
 
+    public long promptForLong(String prompt) {
+        System.out.print(prompt);
+        while (true) {
+            try {
+                return Long.parseLong(scanner.nextLine());
+            } catch (NumberFormatException e) {
+                System.out.println("Please enter a number.");
+            }
+        }
+    }
+
     public BigDecimal promptForBigDecimal(String prompt) {
         System.out.print(prompt);
         while (true) {

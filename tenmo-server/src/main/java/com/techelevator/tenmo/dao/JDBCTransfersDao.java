@@ -1,5 +1,6 @@
 package com.techelevator.tenmo.dao;
 
+import com.techelevator.tenmo.model.Account;
 import com.techelevator.tenmo.model.TransferNotFoundException;
 import com.techelevator.tenmo.model.Transfers;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,9 +18,10 @@ public class JDBCTransfersDao implements TransfersDao {
     private JdbcTemplate jdbcTemplate;
     @Autowired
     private AccountDao accountDao;
+    private final long ACCOUNT_ID_OFFSET = 1000;
 
     @Override
-    public List<Transfers> getAllTransfers(int userId) {
+    public List<Transfers> getAllTransfers(long userId) {
         List<Transfers> list = new ArrayList<>();
         String sqlString = "SELECT t.*, tu.username AS userFrom, tub.username AS userTo " +
                 "FROM transfer t " +
@@ -27,7 +29,7 @@ public class JDBCTransfersDao implements TransfersDao {
                 "JOIN account b ON t.account_to = b.account_id " +
                 "JOIN tenmo_user tu ON a.user_id = tu.user_id " +
                 "JOIN tenmo_user tub ON b.user_id = tub.user_id " +
-                "WHERE a.user_id = ? OR b.user_id = ? ";
+                "WHERE a.user_id = ? OR b.user_id = ?;";
         SqlRowSet results = jdbcTemplate.queryForRowSet(sqlString, userId, userId);
         while (results.next()) {
             Transfers transfers = mapRowToTransfer(results);
@@ -37,51 +39,59 @@ public class JDBCTransfersDao implements TransfersDao {
     }
 
     @Override
-    public Transfers getTransfersById(int transferId) {
-        Transfers transfers = new Transfers();
-        String sqlString = "SELECT t.*, tu.username AS userFrom, tub.username AS userTo " +
+    public Transfers getTransferById(long transferId) {
+        Transfers transfer = new Transfers();
+        String sqlString = "SELECT t.*, u.username AS userFrom, v.username AS userTo, ts.transfer_status_desc, tt.transfer_type_desc " +
                 "FROM transfer t " +
                 "JOIN account a ON t.account_from = a.account_id " +
                 "JOIN account b ON t.account_to = b.account_id " +
-                "JOIN tenmo_user tu ON a.user_id = tu.user_id " +
-                "JOIN tenmo_user tub ON b.user_id = tub.user_ids " +
-                "WHERE a.user_id = ? OR b.user_id = ?";
+                "JOIN tenmo_user u ON a.user_id = u.user_id " +
+                "JOIN tenmo_user v ON b.user_id = v.user_id " +
+                "JOIN transfer_status ts ON t.transfer_status_id = ts.transfer_status_id " +
+                "JOIN transfer_type tt ON t.transfer_type_id = tt.transfer_type_id " +
+                "WHERE t.transfer_id = ?;";
         SqlRowSet results = jdbcTemplate.queryForRowSet(sqlString, transferId);
         if (results.next()) {
-            transfers = mapRowToTransfer(results);
+            transfer = mapRowToTransfer(results);
         } else {
             throw new TransferNotFoundException();
         }
-        return transfers;
+        return transfer;
     }
 
     @Override
-    public String sendTransfer(int userFrom, int userTo, BigDecimal amount) {
+    public String sendTransfer(long userFrom, long userTo, BigDecimal amount) {
+        userTo += ACCOUNT_ID_OFFSET; // hackish solution
+
         if (userFrom == userTo) {
-            return "Invalid, may not send money to yourself";
+            return "You cannot send money to yourself.";
         }
-        if (amount.compareTo(accountDao.getBalance(userFrom)) == -1 && amount.compareTo(new BigDecimal(0)) == 1) {
-            String sqlString = "INSERT INTO transfer (transfer_type_id, transfer_status_id, " +
-                    "account_from, account_to, amount " +
-                    "VALUES (2, 2, ?, ?, ?)"; // 2 = send, 2 = approved
+
+        // if userFrom is sending less money than he/she has in their account, AND the amount they are sending is greater than 0...
+        int checkBalance = amount.compareTo(accountDao.getBalance(userFrom - ACCOUNT_ID_OFFSET));
+        int checkPositive = amount.compareTo(new BigDecimal(0));
+
+        if (checkBalance < 0 && checkPositive > 0) { // -1 and +1, respectively
+            String sqlString = "INSERT INTO transfer (transfer_type_id, transfer_status_id, account_from, account_to, amount) " +
+                    "VALUES (2, 2, ?, ?, ?);"; // 2 = send, 2 = approved
             jdbcTemplate.update(sqlString, userFrom, userTo, amount);
             accountDao.addToBalance(amount, userTo);
             accountDao.subtractFromBalance(amount, userFrom);
-            return "Transfer has been completed";
+            return "Transfer complete";
         } else {
-            return "Transfer failed, not enough money in account to complete or entered an invalid user";
+            return "Transfer failed due to a lack of funds or a non-positive amount was entered";
         }
     }
 
     @Override
-    public String requestTransfer(int userFrom, int userTo, BigDecimal amount) {
+    public String requestTransfer(long userFrom, long userTo, BigDecimal amount) {
         if (userFrom == userTo) {
             return "You may not request money from yourself";
         }
         if (amount.compareTo(new BigDecimal(0)) == 1) {
             String sqlString = "INSERT INTO transfer (transfer_type_id, transfer_status_id, " +
                     "account_from, account_to, amount " +
-                    "VALUES (1, 1, ?, ?, ?)"; // 1 = request, 1 = pending
+                    "VALUES (1, 1, ?, ?, ?);"; // 1 = request, 1 = pending
             jdbcTemplate.update(sqlString, userFrom, userFrom, amount);
             return "Your request has been sent";
         } else {
@@ -90,7 +100,7 @@ public class JDBCTransfersDao implements TransfersDao {
     }
 
     @Override
-    public List<Transfers> getPendingRequests(int userId) {
+    public List<Transfers> getPendingRequests(long userId) {
         List<Transfers> outcome = new ArrayList<>();
         String sqlString = "SELECT t.*, tu.username AS userFrom, tub.username AS userTo " +
                 "FROM transfer t " +

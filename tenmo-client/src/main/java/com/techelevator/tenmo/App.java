@@ -1,12 +1,10 @@
 package com.techelevator.tenmo;
 
-import com.techelevator.tenmo.model.Account;
-import com.techelevator.tenmo.model.AuthenticatedUser;
-import com.techelevator.tenmo.model.User;
-import com.techelevator.tenmo.model.UserCredentials;
+import com.techelevator.tenmo.model.*;
 import com.techelevator.tenmo.services.AccountService;
 import com.techelevator.tenmo.services.AuthenticationService;
 import com.techelevator.tenmo.services.ConsoleService;
+import com.techelevator.tenmo.services.TransferService;
 import io.cucumber.java.en_old.Ac;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -24,7 +22,8 @@ public class App {
     private final AuthenticationService authenticationService = new AuthenticationService(API_BASE_URL);
 
     private AuthenticatedUser currentUser;
-    private AccountService accountService = new AccountService(API_BASE_URL, currentUser);
+    private AccountService accountService;
+    private TransferService transferService;
 
     RestTemplate restTemplate = new RestTemplate();
 
@@ -99,28 +98,22 @@ public class App {
     }
 
 	private void viewCurrentBalance() {
-        try {
-            BigDecimal balance = restTemplate.exchange(API_BASE_URL + "api/balance", HttpMethod.GET,
-                    makeAuthEntity(), BigDecimal.class).getBody();
-            System.out.println("Your current account balance is: $" + balance);
-        } catch (RestClientResponseException exception) {
-            System.out.println("Unable to retrieve balance");
-        }
+        accountService = new AccountService(API_BASE_URL, currentUser);
+        accountService.getBalance();
 	}
 
 	private void viewTransferHistory() {
-		// TODO Auto-generated method stub
-		
+        transferService = new TransferService(API_BASE_URL, currentUser);
+        transferService.transferList();
 	}
 
 	private void viewPendingRequests() {
 		// TODO Auto-generated method stub
-		
 	}
 
 	private void sendBucks() {
-		// TODO Auto-generated method stub
-		
+        transferService = new TransferService(API_BASE_URL, currentUser);
+        transferService.sendBucks();
 	}
 
 	private void requestBucks() {
