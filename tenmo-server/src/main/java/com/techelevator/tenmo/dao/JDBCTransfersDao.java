@@ -129,15 +129,17 @@ public class JDBCTransfersDao implements TransfersDao {
 
     @Override
     public String updateTransferRequest(Transfers transfers, int statusId) {
-        if (statusId == 3) { // 3 = rejected
+        if (statusId == 3) { // 3 = rejected; same as entering a 2
             String sqlString = "UPDATE transfer SET transfer_status_id = ? WHERE transfer_id = ?;";
             jdbcTemplate.update(sqlString, statusId, transfers.getTransferId());
 
             return "Update has been successful";
         }
 
-        // FIX THIS
-        if (!(accountDao.getBalance(transfers.getAccountFrom()).compareTo(transfers.getAmount()) == -1)) {
+        int checkBalance = accountDao.getBalance(transfers.getAccountFrom() - ACCOUNT_ID_OFFSET).compareTo(transfers.getAmount());
+
+        // user has accepted the transfer
+        if (checkBalance > 0) {
             String sqlString = "UPDATE transfer SET transfer_status_id = ? WHERE transfer_id = ?;";
             jdbcTemplate.update(sqlString, statusId, transfers.getTransferId());
             accountDao.addToBalance(transfers.getAmount(), transfers.getAccountTo());
