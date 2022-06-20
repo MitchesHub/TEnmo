@@ -15,7 +15,6 @@ import com.techelevator.tenmo.model.AuthenticatedUser;
 import com.techelevator.tenmo.model.UserCredentials;
 
 public class AuthenticationService {
-
     private final String baseUrl;
     private final RestTemplate restTemplate = new RestTemplate();
 
@@ -53,4 +52,4 @@ public class AuthenticationService {
         headers.setContentType(MediaType.APPLICATION_JSON);
         return new HttpEntity<>(credentials, headers);
     }
-    }
+}

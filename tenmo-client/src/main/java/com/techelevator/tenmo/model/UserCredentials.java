@@ -1,7 +1,6 @@
 package com.techelevator.tenmo.model;
 
 public class UserCredentials {
-
     private String username;
     private String password;
 
@@ -25,5 +24,5 @@ public class UserCredentials {
     public void setPassword(String password) {
         this.password = password;
     }
-    }
+}
 

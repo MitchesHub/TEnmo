@@ -18,9 +18,9 @@ public class App {
     private static final String API_BASE_URL = "http://localhost:8080/";
     private final ConsoleService consoleService = new ConsoleService();
     private final AuthenticationService authenticationService = new AuthenticationService(API_BASE_URL);
+    private AccountService accountService;
     private AuthenticatedUser currentUser;
     private TransferService transferService;
-
     RestTemplate restTemplate = new RestTemplate();
 
     public static void main(String[] args) {
@@ -31,15 +31,20 @@ public class App {
     private void run() {
         consoleService.printGreeting();
         loginMenu();
+
         if (currentUser != null) {
             mainMenu();
         }
     }
+
     private void loginMenu() {
         int menuSelection = -1;
+
         while (menuSelection != 0 && currentUser == null) {
             consoleService.printLoginMenu();
+
             menuSelection = consoleService.promptForMenuSelection("Please choose an option: ");
+
             if (menuSelection == 1) {
                 handleRegister();
             } else if (menuSelection == 2) {
@@ -53,7 +58,9 @@ public class App {
 
     private void handleRegister() {
         System.out.println("Please register a new user account");
+
         UserCredentials credentials = consoleService.promptForCredentials();
+
         if (authenticationService.register(credentials)) {
             System.out.println("Registration successful. You can now login.");
         } else {
@@ -64,6 +71,7 @@ public class App {
     private void handleLogin() {
         UserCredentials credentials = consoleService.promptForCredentials();
         currentUser = authenticationService.login(credentials);
+
         if (currentUser == null) {
             consoleService.printErrorMessage();
         }
@@ -71,9 +79,12 @@ public class App {
 
     private void mainMenu() {
         int menuSelection = -1;
+
         while (menuSelection != 0) {
             consoleService.printMainMenu();
+
             menuSelection = consoleService.promptForMenuSelection("Please choose an option: ");
+
             if (menuSelection == 1) {
                 viewCurrentBalance();
             } else if (menuSelection == 2) {
@@ -89,6 +100,7 @@ public class App {
             } else {
                 System.out.println("Invalid Selection");
             }
+
             consoleService.pause();
         }
     }
@@ -121,7 +133,7 @@ public class App {
     private HttpEntity<UserCredentials> makeAuthEntity() {
         org.springframework.http.HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(currentUser.getToken());
-        HttpEntity entity = new HttpEntity<>(headers);
-        return entity;
+
+        return new HttpEntity<>(headers);
     }
 }

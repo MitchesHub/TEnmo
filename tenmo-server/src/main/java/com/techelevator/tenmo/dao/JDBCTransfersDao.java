@@ -18,7 +18,7 @@ public class JDBCTransfersDao implements TransfersDao {
     private JdbcTemplate jdbcTemplate;
     @Autowired
     private AccountDao accountDao;
-    private final long ACCOUNT_ID_OFFSET = 1000;
+    private final long ACCOUNT_ID_OFFSET = 1000; // workaround for getting account ID
 
     @Override
     public List<Transfers> getAllTransfers(long userId) {
@@ -42,7 +42,7 @@ public class JDBCTransfersDao implements TransfersDao {
 
     @Override
     public Transfers getTransferById(long transferId) {
-        Transfers transfer = new Transfers();
+        Transfers transfer;
         String sqlString = "SELECT t.*, u.username AS userFrom, v.username AS userTo, ts.transfer_status_desc, tt.transfer_type_desc " +
                 "FROM transfer t " +
                 "JOIN account a ON t.account_from = a.account_id " +

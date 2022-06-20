@@ -1,7 +1,6 @@
 package com.techelevator.tenmo.model;
 
 public class TransferStatuses {
-
     private int transferStatusId;
     private String TransferStatusDesc;
 
