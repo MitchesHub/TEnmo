@@ -68,7 +68,8 @@ public class TransferService {
                         Transfers pending = restTemplate.exchange(BASE_URL + "transfers/" + i.getTransferId(),
                                 HttpMethod.GET, makeAuthEntity(), Transfers.class).getBody();
                         givenTransferId = true;
-                        //assert pending != null;
+                        assert pending != null;
+
                         System.out.println("-------------------------------------------" + System.lineSeparator() +
                                 "Transfer Details" + System.lineSeparator() +
                                 "-------------------------------------------" + System.lineSeparator() +
@@ -111,10 +112,9 @@ public class TransferService {
                 }
             }
 
-            System.out.print("-------------------------------------------" + System.lineSeparator() +
-                    "Enter ID of user you are sending to (0 to cancel): ");
+            System.out.print("-------------------------------------------" + System.lineSeparator());
 
-            transfer.setAccountTo(Long.parseLong(scanner.nextLine()));
+            transfer.setAccountTo(consoleService.promptForLong("Enter ID of user you are sending to (0 to cancel): "));
             transfer.setAccountFrom(currentUser.getUser().getId() + ACCOUNT_ID_OFFSET);
 
             if (transfer.getAccountTo() != 0) {
@@ -146,11 +146,10 @@ public class TransferService {
                 }
             }
 
-            System.out.print("-------------------------------------------" + System.lineSeparator() +
-                    "Enter ID of user you are requesting from (0 to cancel): ");
+            System.out.print("-------------------------------------------" + System.lineSeparator());
 
             transfer.setAccountTo(currentUser.getUser().getId());
-            transfer.setAccountFrom(Long.parseLong(scanner.nextLine()) + ACCOUNT_ID_OFFSET);
+            transfer.setAccountFrom(consoleService.promptForLong("Enter ID of user you are requesting from (0 to cancel): ") + ACCOUNT_ID_OFFSET);
 
             if (transfer.getAccountTo() != 0) {
                 transfer.setAmount(consoleService.promptForBigDecimal("Enter amount: "));
@@ -178,11 +177,11 @@ public class TransferService {
             String name = "";
 
             for (Transfers i : output) {
-                if (currentUser.getUser().getId() == i.getAccountFrom()) {
-                    toOrFrom = "From: ";
+                if (currentUser.getUser().getId() + ACCOUNT_ID_OFFSET == i.getAccountFrom()) {
+                    toOrFrom = "To: ";
                     name = i.getUserTo();
                 } else {
-                    toOrFrom = "To: ";
+                    toOrFrom = "From: ";
                     name = i.getUserFrom();
                 }
 
@@ -190,14 +189,15 @@ public class TransferService {
             }
 
             System.out.print("-------------------------------------------" + System.lineSeparator());
-            String input = consoleService.promptForString("Please enter transfer ID to approve/reject (0 to cancel): ");
 
-            if (Long.parseLong(input) != 0) {
+            long input = consoleService.promptForLong("Please enter transfer ID to approve/reject (0 to cancel): ");
+
+            if (input != 0) {
                 boolean foundTransferId = false;
 
                 for (Transfers i : output) {
-                    if (i.getAccountTo() != currentUser.getUser().getId()) {
-                        if (Integer.parseInt(input) == i.getTransferId()) {
+                    if (i.getAccountTo() != currentUser.getUser().getId() + ACCOUNT_ID_OFFSET) {
+                        if (input == i.getTransferId()) {
                             System.out.print("-------------------------------------------" + System.lineSeparator() +
                                     i.getTransferId() +"\t\t" + toOrFrom + name + "\t\t$" + i.getAmount() + System.lineSeparator() +
                                     "1: Approve" + System.lineSeparator() +
@@ -206,11 +206,11 @@ public class TransferService {
                                     "--------------------------" + System.lineSeparator());
 
                             try {
-                                int id = 1 + Integer.parseInt(consoleService.promptForString("Please choose an option: "));
+                                int id = consoleService.promptForInt("Please choose an option: ");
 
-                                // DOUBLE-CHECK THIS
-                                if (id != 1) {
-                                    results = restTemplate.exchange(BASE_URL + "transfer/status/" + id, HttpMethod.PUT, makeTransferEntity(i), String.class).getBody();
+                                // only options 1 and 2 do anything
+                                if (id == 1 || id == 2) {
+                                    results = restTemplate.exchange(BASE_URL + "transfer/status/" + (id + 1), HttpMethod.PUT, makeTransferEntity(i), String.class).getBody();
                                     System.out.println(results);
                                     foundTransferId = true;
                                 }
@@ -239,6 +239,7 @@ public class TransferService {
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setBearerAuth(currentUser.getToken());
         HttpEntity<Transfers> entity = new HttpEntity<>(transfer, headers);
+
         return entity;
     }
 
@@ -246,6 +247,7 @@ public class TransferService {
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(currentUser.getToken());
         HttpEntity entity = new HttpEntity<>(headers);
+
         return entity;
     }
 }
