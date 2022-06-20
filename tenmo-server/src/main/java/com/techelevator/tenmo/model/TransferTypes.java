@@ -1,7 +1,6 @@
 package com.techelevator.tenmo.model;
 
 public class TransferTypes {
-
     private int transferTypeId;
     private String transferTypeDesc;
 

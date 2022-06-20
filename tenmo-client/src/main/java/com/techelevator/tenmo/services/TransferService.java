@@ -1,26 +1,20 @@
 package com.techelevator.tenmo.services;
 
-import com.techelevator.tenmo.model.Account;
 import com.techelevator.tenmo.model.AuthenticatedUser;
 import com.techelevator.tenmo.model.Transfers;
 import com.techelevator.tenmo.model.User;
-import io.cucumber.java.sl.In;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.web.client.RestTemplate;
 
-import java.io.Console;
-import java.math.BigDecimal;
-import java.util.Scanner;
-
 public class TransferService {
     private String BASE_URL;
     private RestTemplate restTemplate = new RestTemplate();
     private AuthenticatedUser currentUser;
     private ConsoleService consoleService = new ConsoleService();
-    private final long ACCOUNT_ID_OFFSET = 1000;
+    private final long ACCOUNT_ID_OFFSET = 1000; // workaround for getting account ID
 
     public TransferService(String url, AuthenticatedUser currentUser) {
         BASE_URL = url;
@@ -39,8 +33,8 @@ public class TransferService {
                     "ID\t\tFrom/To\t\t\t\tAmount" + System.lineSeparator() +
                     "-------------------------------------------");
 
-            String toFrom = "";
-            String name = "";
+            String toFrom;
+            String name;
 
             for (Transfers i : output) {
                 if (currentUser.getUser().getId() + ACCOUNT_ID_OFFSET == i.getAccountFrom()) {
@@ -54,20 +48,19 @@ public class TransferService {
                 System.out.println(i.getTransferId() + "\t" + toFrom + name + "\t\t\t$" + i.getAmount());
             }
 
-            System.out.println("-------------------------------------------\r" +
-                    "Please enter transfer ID to view details (0 to cancel):");
+            System.out.println("-------------------------------------------" + System.lineSeparator());
 
-            Scanner scanner = new Scanner(System.in);
-            String input = scanner.nextLine();
+            long input = consoleService.promptForLong("Please enter transfer ID to view details (0 to cancel): ");
 
-            if (Long.parseLong(input) != 0) {
+            if (input != 0) {
                 boolean givenTransferId = false;
 
                 for (Transfers i : output) {
-                    if (Long.parseLong(input) == i.getTransferId()) {
+                    if (input == i.getTransferId()) {
                         Transfers pending = restTemplate.exchange(BASE_URL + "transfers/" + i.getTransferId(),
                                 HttpMethod.GET, makeAuthEntity(), Transfers.class).getBody();
                         givenTransferId = true;
+
                         assert pending != null;
 
                         System.out.println("-------------------------------------------" + System.lineSeparator() +
@@ -94,17 +87,18 @@ public class TransferService {
     }
 
     public void sendBucks() {
-        User[] users = null;
+        User[] users;
         Transfers transfer = new Transfers();
 
         try {
-            Scanner scanner = new Scanner(System.in);
             users = restTemplate.exchange(BASE_URL + "api/users", HttpMethod.GET, makeAuthEntity(), User[].class).getBody();
 
             System.out.println("-------------------------------------------" + System.lineSeparator() +
                     "Users" + System.lineSeparator() +
                     "ID\t\t\tName" + System.lineSeparator() +
                     "-------------------------------------------");
+
+            assert users != null;
 
             for (User i : users) {
                 if (i.getId() != currentUser.getUser().getId()) {
@@ -123,16 +117,15 @@ public class TransferService {
                 System.out.println(output);
             }
         } catch (Exception e) {
-            System.out.println("Bad input!");
+            System.out.println("Whoops! Something terrible has happened");
         }
     }
 
     public void requestBucks() {
-        User[] users = null;
+        User[] users;
         Transfers transfer = new Transfers();
 
         try {
-            Scanner scanner = new Scanner(System.in);
             users = restTemplate.exchange(BASE_URL + "api/users", HttpMethod.GET, makeAuthEntity(), User[].class).getBody();
 
             System.out.println("-------------------------------------------" + System.lineSeparator() +
@@ -157,12 +150,12 @@ public class TransferService {
                 System.out.println(output);
             }
         } catch (Exception e) {
-            System.out.println("Bad input!");
+            System.out.println("Whoops! Something terrible has happened");
         }
     }
 
     public Transfers[] transfersRequestList() {
-        Transfers [] output = null;
+        Transfers[] output = null;
         String results;
 
         try {
@@ -223,7 +216,7 @@ public class TransferService {
                             }
                         }
                     } else {
-                        System.out.println("You can not approve/reject your own request.");
+                        System.out.println("You can not approve/reject your own request");
                     }
                 }
             }
@@ -246,8 +239,7 @@ public class TransferService {
     private HttpEntity makeAuthEntity() {
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(currentUser.getToken());
-        HttpEntity entity = new HttpEntity<>(headers);
 
-        return entity;
+        return new HttpEntity<>(headers);
     }
 }

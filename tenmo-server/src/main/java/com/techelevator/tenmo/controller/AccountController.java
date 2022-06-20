@@ -42,9 +42,4 @@ public class AccountController {
        long id = user.getId();
        return accountDao.getBalance(id);
     }
-
-    @RequestMapping(path = "/account/user/{id}", method = RequestMethod.GET)
-    public Account findUserById(@PathVariable long userId) {
-        return accountDao.findUserById(userId);
-    }
 }
